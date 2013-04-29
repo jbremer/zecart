@@ -1,6 +1,7 @@
 # zecart
 
-Efficient &amp; customizable Tracing framework on top of Pin.
+Efficient &amp; customizable Tracing framework on top of Pin, supporting 32
+and 64-bit applications for both Linux &amp; Windows.
 
 # Whitelists
 
