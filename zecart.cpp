@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "pin.H"
-
-#define sizeofarray(x) (sizeof(x)/sizeof((x)[0]))
+#include "zecart.h"
 
 #ifdef TARGET_IA32
 
