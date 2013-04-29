@@ -148,8 +148,9 @@ void module_range_handler(IMG img, void *v)
             ADDRINT start = IMG_LowAddress(img);
             ADDRINT end = IMG_HighAddress(img);
             add_instrument_range(start, end);
-            fprintf(stderr, "Added %s -> 0x%08x 0x%08x\n", imgname, start,
-                end);
+
+            log_info("Module %s covers range 0x%08x..0x%08x\n",
+                imgname, start, end);
         }
     }
 }

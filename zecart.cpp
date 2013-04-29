@@ -226,22 +226,28 @@ int main(int argc, char *argv[])
     for (int i = 3; i < argc; i++) {
         if(!strcmp(argv[i], "--main-module")) {
             set_main_module();
+            log_info("Whitelisted the main module\n");
         }
         else if(!strcmp(argv[i], "--range")) {
             ADDRINT start = strtoul(argv[++i], NULL, 16);
             ADDRINT end = strtoul(argv[++i], NULL, 16);
             add_instrument_range(start, end);
+            log_info("Whitelisted range 0x%08x..0x%08x\n", start, end);
         }
         else if(!strcmp(argv[i], "--ins")) {
             add_instrument_instruction(argv[++i]);
+            log_info("Whitelisted mnemonic: %s\n", argv[i]);
         }
         else if(!strcmp(argv[i], "--inside")) {
             ADDRINT start = strtoul(argv[++i], NULL, 16);
             ADDRINT end = strtoul(argv[++i], NULL, 16);
             add_instrument_inside(start, end);
+            log_info("Whitelisted inside sequence 0x%08x..0x%08x\n",
+                start, end);
         }
         else if(!strcmp(argv[i], "--module")) {
             add_instrument_module(argv[++i]);
+            log_info("Whitelisted modules containing: %s\n", argv[i]);
         }
     }
 
