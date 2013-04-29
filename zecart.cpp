@@ -135,12 +135,7 @@ int should_instrument_ins(INS ins)
         return 0;
     }
 
-    if(is_accepted_address(INS_Address(ins)) == 0 &&
-            is_inside_sequence(ins) == 0) {
-        return 0;
-    }
-
-    return 1;
+    return is_accepted_address(ins);
 }
 
 int inside = 0;
