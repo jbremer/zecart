@@ -131,11 +131,10 @@ void print_newline()
 
 int should_instrument_ins(INS ins)
 {
-    if(is_accepted_mnemonic(INS_Opcode(ins)) == 0) {
-        return 0;
+    if(is_accepted_address(ins)) {
+        return is_accepted_mnemonic(INS_Opcode(ins));
     }
-
-    return is_accepted_address(ins);
+    return 0;
 }
 
 int inside = 0;
