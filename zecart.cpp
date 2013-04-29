@@ -135,7 +135,8 @@ int should_instrument_ins(INS ins)
         return 0;
     }
 
-    if(is_accepted_address(INS_Address(ins)) == 0) {
+    if(is_accepted_address(INS_Address(ins)) == 0 &&
+            is_inside_sequence(ins) == 0) {
         return 0;
     }
 
@@ -253,6 +254,11 @@ int main(int argc, char *argv[])
         }
         else if(!strcmp(argv[i], "--ins")) {
             add_instrument_instruction(argv[++i]);
+        }
+        else if(!strcmp(argv[i], "--inside")) {
+            ADDRINT start = strtoul(argv[++i], NULL, 16);
+            ADDRINT end = strtoul(argv[++i], NULL, 16);
+            add_instrument_inside(start, end);
         }
     }
 
