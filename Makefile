@@ -2,12 +2,12 @@ CL = cl
 
 PINTOOL = ../pintool
 DLLS = zecart-x86.dll
-SOURCES = $(wildcard *.cpp)
 LINK = C:/ProgFiles86/Microsoft\ Visual\ Studio\ 10.0/VC/Bin/link.exe
 
+SOURCES = $(wildcard *.cpp)
 OBJECTS86 = $(patsubst %.cpp, %-x86.obj, $(SOURCES))
 
-default: $(DLLS)
+default: $(OBJECTS86) $(DLLS)
 
 %-x86.obj: %.cpp
 	$(CL) /c /MT /EHs- /EHa- /wd4530 /DTARGET_WINDOWS \
