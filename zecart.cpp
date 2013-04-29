@@ -2,10 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "pin.H"
 #include "zecart.h"
-#include "modules.h"
-#include "instructions.h"
 
 #ifdef TARGET_IA32
 
