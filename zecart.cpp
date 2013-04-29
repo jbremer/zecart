@@ -240,6 +240,9 @@ int main(int argc, char *argv[])
             ADDRINT end = strtoul(argv[++i], NULL, 16);
             add_instrument_inside(start, end);
         }
+        else if(!strcmp(argv[i], "--module")) {
+            add_instrument_module(argv[++i]);
+        }
     }
 
     PIN_Init(argc, argv);
@@ -249,7 +252,8 @@ int main(int argc, char *argv[])
         g_reg_index[g_reg_names_order[i]] = i + 1;
     }
 
-    INS_AddInstrumentFunction(&insns, 0);
+    IMG_AddInstrumentFunction(&module_range_handler, NULL);
+    INS_AddInstrumentFunction(&insns, NULL);
 
     PIN_StartProgram();
     return 0;

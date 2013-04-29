@@ -20,6 +20,10 @@ static ADDRINT g_inside_end[0x100];
 // current inside counter
 static uint32_t g_inside_cur = 0;
 
+// whitelisted modules
+static uint32_t g_module_count = 0;
+static const char *g_modules[0x100];
+
 
 void set_main_module()
 {
@@ -46,6 +50,16 @@ void add_instrument_inside(ADDRINT start, ADDRINT end)
 
     g_inside_start[g_inside_count] = start;
     g_inside_end[g_inside_count++] = end;
+}
+
+void add_instrument_module(const char *module)
+{
+    if(g_module_count == sizeofarray(g_modules)) {
+        fprintf(stderr, "Specified too many modules!\n");
+        exit(1);
+    }
+
+    g_modules[g_module_count++] = _strdup(module);
 }
 
 static void increase_inside_cur()
@@ -95,6 +109,14 @@ int is_inside_sequence(INS ins)
 
 int is_accepted_address(INS ins)
 {
+    // if main-module is not specified, there are no whitelisted ranges, there
+    // are no inside sequences, and no whitelisted modules, then every
+    // instruction should be logged
+    if(g_main_module == 0 && g_range_count == 0 && g_inside_count == 0 &&
+            g_module_count == 0) {
+        return 1;
+    }
+
     ADDRINT addr = INS_Address(ins);
 
     // check if we're in the main module
@@ -114,13 +136,20 @@ int is_accepted_address(INS ins)
         }
     }
 
-    // if main-module is not specified and there are no whitelisted ranges,
-    // then we have to check for inside sequences
-    if(g_main_module == 0 && g_range_count == 0) {
-        return is_inside_sequence(ins);
-    }
+    // check for inside sequences
+    return is_inside_sequence(ins);
+}
 
-    // nor the main-module nor the ranges matched, so we're not interested
-    // in the instruction at this address
-    return 0;
+void module_range_handler(IMG img, void *v)
+{
+    const char *imgname = IMG_Name(img).c_str();
+    for (uint32_t i = 0; i < g_module_count; i++) {
+        if(strstr(imgname, g_modules[i]) != NULL) {
+            ADDRINT start = IMG_LowAddress(img);
+            ADDRINT end = IMG_HighAddress(img);
+            add_instrument_range(start, end);
+            fprintf(stderr, "Added %s -> 0x%08x 0x%08x\n", imgname, start,
+                end);
+        }
+    }
 }
