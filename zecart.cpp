@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "pin.H"
 #include "zecart.h"
+#include "modules.h"
 
 #ifdef TARGET_IA32
 
@@ -34,8 +36,6 @@ ADDRINT g_reg_values[16];
 
 uint32_t g_reg_index[REG_LAST];
 
-
-int only_main_module = 0;
 
 void execute_instruction(ADDRINT addr, const char *insns)
 {
@@ -131,14 +131,20 @@ void print_newline()
     printf("\n");
 }
 
+int should_instrument_ins(INS ins)
+{
+    if(is_accepted_address(INS_Address(ins)) == 0) {
+        return 0;
+    }
+
+    return 1;
+}
+
 int inside = 0;
 
 void insns(INS ins, void *v)
 {
-    IMG img = IMG_FindByAddress(INS_Address(ins));
-    int main_module = IMG_Valid(img) ? IMG_IsMainExecutable(img) : 0;
-
-    if(only_main_module != 0 && main_module == 0) {
+    if(should_instrument_ins(ins) == 0) {
         return;
     }
 
@@ -235,8 +241,14 @@ void insns(INS ins, void *v)
 int main(int argc, char *argv[])
 {
     for (int i = 3; i < argc; i++) {
-        if(!strcmp(argv[i], "--only-main-module")) {
-            only_main_module = 1;
+        if(!strcmp(argv[i], "--main-module")) {
+            set_main_module();
+        }
+        else if(!strcmp(argv[i], "--range")) {
+            ADDRINT start = strtoul(argv[++i], NULL, 16);
+            ADDRINT end = strtoul(argv[++i], NULL, 16);
+            add_instrument_range(start, end);
+        }
         }
     }
 
