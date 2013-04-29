@@ -5,6 +5,7 @@
 #include "pin.H"
 #include "zecart.h"
 #include "modules.h"
+#include "instructions.h"
 
 #ifdef TARGET_IA32
 
@@ -133,6 +134,10 @@ void print_newline()
 
 int should_instrument_ins(INS ins)
 {
+    if(is_accepted_mnemonic(INS_Opcode(ins)) == 0) {
+        return 0;
+    }
+
     if(is_accepted_address(INS_Address(ins)) == 0) {
         return 0;
     }
@@ -249,6 +254,8 @@ int main(int argc, char *argv[])
             ADDRINT end = strtoul(argv[++i], NULL, 16);
             add_instrument_range(start, end);
         }
+        else if(!strcmp(argv[i], "--ins")) {
+            add_instrument_instruction(argv[++i]);
         }
     }
 
