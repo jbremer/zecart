@@ -146,20 +146,6 @@ void insns(INS ins, void *v)
         return;
     }
 
-    if(INS_Address(ins) == 0x401fc0) {
-        inside = 1;
-    }
-
-    //if(inside == 0) return;
-
-    if(INS_Address(ins) == 0x40206a) {
-        inside = 0;
-    }
-
-    if(INS_Mnemonic(ins) != "XOR") {
-        //return;
-    }
-
     // dump the instruction
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &execute_instruction, IARG_INST_PTR, IARG_PTR, _strdup(INS_Disassemble(ins).c_str()), IARG_END);
 
