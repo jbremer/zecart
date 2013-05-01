@@ -51,10 +51,7 @@ int main(int argc, char *argv[])
 
     PIN_Init(argc, argv);
 
-    // initialize reg indices (as we keep a state at some point)
-    for (uint32_t i = 0; i < sizeofarray(g_reg_names_order); i++) {
-        g_reg_index[g_reg_names_order[i]] = i + 1;
-    }
+    init_registers();
 
     IMG_AddInstrumentFunction(&module_range_handler, NULL);
     INS_AddInstrumentFunction(&insns, NULL);
