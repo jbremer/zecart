@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
             log_info("Whitelisted range 0x%08x..0x%08x\n", start, end);
         }
         else if(!strcmp(argv[i], "--ins")) {
-            add_instrument_instruction(argv[++i]);
-            log_info("Whitelisted mnemonic: %s\n", argv[i]);
+            log_info("Whitelisted mnemonic(s): %s\n", argv[++i]);
+            add_instrument_instruction(argv[i]);
         }
         else if(!strcmp(argv[i], "--inside")) {
             ADDRINT start = strtoul(argv[++i], NULL, 16);
