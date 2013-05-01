@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "pin.H"
 #include "zecart.h"
 
@@ -59,7 +60,7 @@ void add_instrument_module(const char *module)
         exit(1);
     }
 
-    g_modules[g_module_count++] = _strdup(module);
+    g_modules[g_module_count++] = strdup(module);
 }
 
 static void increase_inside_cur()

@@ -146,7 +146,7 @@ void insns(INS ins, void *v)
     }
 
     // dump the instruction
-    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &execute_instruction, IARG_INST_PTR, IARG_PTR, _strdup(INS_Disassemble(ins).c_str()), IARG_END);
+    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &execute_instruction, IARG_INST_PTR, IARG_PTR, strdup(INS_Disassemble(ins).c_str()), IARG_END);
 
     // reads memory (1)
     if(INS_IsMemoryRead(ins) != 0) {

@@ -4,3 +4,7 @@
 #include "logging.h"
 
 #define sizeofarray(x) (sizeof(x)/sizeof((x)[0]))
+
+#ifndef TARGET_LINUX
+#define strdup _strdup
+#endif
