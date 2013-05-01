@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include "zecart.h"
 
@@ -48,7 +49,11 @@ static void dump_memory_helper(void *ptr, uint32_t size)
         break;
 
     case 8:
+#ifdef TARGET_IA32
+        printf("0x%016llx", *(uint64_t *) ptr);
+#else
         printf("0x%016lx", *(uint64_t *) ptr);
+#endif
         break;
 
     default:
@@ -91,17 +96,25 @@ static void dump_reg_before(uint32_t reg_index, ADDRINT value)
 
 static void dump_reg_rw_after(uint32_t reg_index, ADDRINT value)
 {
-    printf("RW %s 0x%08x 0x%08x, ", g_reg_names[reg_index], g_reg_values[reg_index], value);
+    printf("RW %s ", g_reg_names[reg_index]);
+    print_addrint(g_reg_values[reg_index]);
+    printf(" ");
+    print_addrint(value);
+    printf(", ");
 }
 
 static void dump_reg_r_after(uint32_t reg_index)
 {
-    printf("R %s 0x%08x, ", g_reg_names[reg_index], g_reg_values[reg_index]);
+    printf("R %s ", g_reg_names[reg_index]);
+    print_addrint(g_reg_values[reg_index]);
+    printf(", ");
 }
 
 static void dump_reg_w_after(uint32_t reg_index, ADDRINT value)
 {
-    printf("W %s 0x%08x, ", g_reg_names[reg_index], value);
+    printf("W %s ", g_reg_names[reg_index]);
+    print_addrint(value);
+    printf(", ");
 }
 
 static void print_newline()
