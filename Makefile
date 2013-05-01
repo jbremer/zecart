@@ -4,7 +4,7 @@ CXX = g++
 SOURCES = $(wildcard *.cpp)
 
 ifeq ($(OS),Windows_NT)
-	OBJECTS = $(patsubst %.cpp, %-x86.obj, $(SOURCES))
+	OBJECTS86 = $(patsubst %.cpp, %-x86.obj, $(SOURCES))
 	PINTOOLS = zecart-x86.dll
 else
 	OBJECTS86 = $(patsubst %.cpp, %-x86.o, $(SOURCES))
