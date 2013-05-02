@@ -125,33 +125,45 @@ static void print_newline()
 void log_ins(INS ins)
 {
     // dump the instruction
-    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &execute_instruction, IARG_INST_PTR, IARG_PTR, strdup(INS_Disassemble(ins).c_str()), IARG_END);
+    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &execute_instruction,
+        IARG_INST_PTR, IARG_PTR, strdup(INS_Disassemble(ins).c_str()),
+        IARG_END);
 
     // reads memory (1)
     if(INS_IsMemoryRead(ins) != 0) {
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_read_memory, IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE, IARG_END);
+        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_read_memory,
+            IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE, IARG_END);
     }
 
     // reads memory (2)
     if(INS_HasMemoryRead2(ins) != 0) {
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_read_memory, IARG_MEMORYREAD2_EA, IARG_MEMORYREAD_SIZE, IARG_END);
+        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_read_memory,
+            IARG_MEMORYREAD2_EA, IARG_MEMORYREAD_SIZE, IARG_END);
     }
 
     IPOINT after = IPOINT_AFTER;
     if(INS_IsCall(ins) != 0) {
+        // TODO is this correct?
         after = IPOINT_TAKEN_BRANCH;
     }
     else if(INS_IsSyscall(ins) != 0) {
+        // TODO support syscalls
         return;
     }
-    else if(INS_HasFallThrough(ins) == 0 && (INS_IsBranch(ins) != 0 || INS_IsRet(ins) != 0)) {
+    else if(INS_HasFallThrough(ins) == 0 && (INS_IsBranch(ins) != 0 ||
+            INS_IsRet(ins) != 0)) {
+        // TODO is this correct?
         after = IPOINT_TAKEN_BRANCH;
     }
 
     // dump written memory
     if(INS_IsMemoryWrite(ins) != 0) {
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_written_memory_before, IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE, IARG_END);
-        INS_InsertCall(ins, after, (AFUNPTR) &dump_written_memory_after, IARG_END);
+        INS_InsertCall(ins, IPOINT_BEFORE,
+            (AFUNPTR) &dump_written_memory_before, IARG_MEMORYWRITE_EA,
+            IARG_MEMORYWRITE_SIZE, IARG_END);
+
+        INS_InsertCall(ins, after, (AFUNPTR) &dump_written_memory_after,
+            IARG_END);
     }
 
     // dump all affected registers
@@ -161,16 +173,30 @@ void log_ins(INS ins)
                 REG base_reg = INS_OperandMemoryBaseReg(ins, i);
 
                 if(g_reg_index[base_reg] != 0) {
-                    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_reg_before, IARG_UINT32, g_reg_index[base_reg]-1, IARG_REG_VALUE, INS_OperandMemoryBaseReg(ins, i), IARG_END);
-                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_r_after, IARG_UINT32, g_reg_index[base_reg]-1, IARG_END);
+                    INS_InsertCall(ins, IPOINT_BEFORE,
+                        (AFUNPTR) &dump_reg_before,
+                        IARG_UINT32, g_reg_index[base_reg]-1,
+                        IARG_REG_VALUE, INS_OperandMemoryBaseReg(ins, i),
+                        IARG_END);
+
+                    INS_InsertCall(ins, after,
+                        (AFUNPTR) &dump_reg_r_after,
+                        IARG_UINT32, g_reg_index[base_reg]-1, IARG_END);
                 }
             }
             if(INS_OperandMemoryIndexReg(ins, i) != REG_INVALID()) {
                 REG index_reg = INS_OperandMemoryIndexReg(ins, i);
 
                 if(g_reg_index[index_reg] != 0) {
-                    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_reg_before, IARG_UINT32, g_reg_index[index_reg]-1, IARG_REG_VALUE, INS_OperandMemoryIndexReg(ins, i), IARG_END);
-                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_r_after, IARG_UINT32, g_reg_index[index_reg]-1, IARG_END);
+                    INS_InsertCall(ins, IPOINT_BEFORE,
+                        (AFUNPTR) &dump_reg_before,
+                        IARG_UINT32, g_reg_index[index_reg]-1,
+                        IARG_REG_VALUE, INS_OperandMemoryIndexReg(ins, i),
+                        IARG_END);
+
+                    INS_InsertCall(ins, after,
+                        (AFUNPTR) &dump_reg_r_after,
+                        IARG_UINT32, g_reg_index[index_reg]-1, IARG_END);
                 }
             }
         }
@@ -179,19 +205,32 @@ void log_ins(INS ins)
 
             if(INS_OperandReadAndWritten(ins, i) != 0) {
                 if(g_reg_index[reg_index] != 0) {
-                    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_reg_before, IARG_UINT32, g_reg_index[reg_index]-1, IARG_REG_VALUE, reg_index, IARG_END);
-                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_rw_after, IARG_UINT32, g_reg_index[reg_index]-1, IARG_REG_VALUE, reg_index, IARG_END);
+                    INS_InsertCall(ins, IPOINT_BEFORE,
+                        (AFUNPTR) &dump_reg_before,
+                        IARG_UINT32, g_reg_index[reg_index]-1,
+                        IARG_REG_VALUE, reg_index, IARG_END);
+
+                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_rw_after,
+                        IARG_UINT32, g_reg_index[reg_index]-1,
+                        IARG_REG_VALUE, reg_index, IARG_END);
                 }
             }
             else if(INS_OperandRead(ins, i) != 0) {
                 if(g_reg_index[reg_index] != 0) {
-                    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) &dump_reg_before, IARG_UINT32, g_reg_index[reg_index]-1, IARG_REG_VALUE, reg_index, IARG_END);
-                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_r_after, IARG_UINT32, g_reg_index[reg_index]-1, IARG_END);
+                    INS_InsertCall(ins, IPOINT_BEFORE,
+                        (AFUNPTR) &dump_reg_before,
+                        IARG_UINT32, g_reg_index[reg_index]-1,
+                        IARG_REG_VALUE, reg_index, IARG_END);
+
+                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_r_after,
+                        IARG_UINT32, g_reg_index[reg_index]-1, IARG_END);
                 }
             }
             else if(INS_OperandWritten(ins, i) != 0) {
                 if(g_reg_index[reg_index] != 0) {
-                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_w_after, IARG_UINT32, g_reg_index[reg_index]-1, IARG_REG_VALUE, reg_index, IARG_END);
+                    INS_InsertCall(ins, after, (AFUNPTR) &dump_reg_w_after,
+                        IARG_UINT32, g_reg_index[reg_index]-1,
+                        IARG_REG_VALUE, reg_index, IARG_END);
                 }
             }
         }
