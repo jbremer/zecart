@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     PIN_Init(argc, argv);
 
-    init_registers();
+    registers_init();
 
     IMG_AddInstrumentFunction(&module_range_handler, NULL);
     INS_AddInstrumentFunction(&insns, NULL);

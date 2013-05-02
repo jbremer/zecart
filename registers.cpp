@@ -28,7 +28,7 @@ REG g_reg_names_order[16] = {
 
 uint32_t g_reg_index[REG_LAST];
 
-void init_registers()
+void registers_init()
 {
     // initialize reg indices (as we keep a state at some point)
     for (uint32_t i = 0; i < sizeofarray(g_reg_names_order); i++) {

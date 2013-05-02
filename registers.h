@@ -13,4 +13,4 @@ extern REG g_reg_names_order[16];
 
 extern uint32_t g_reg_index[REG_LAST];
 
-void init_registers();
+void registers_init();
