@@ -83,4 +83,31 @@ static inline uint32_t combine(uint32_t a, uint32_t b, uint32_t c,
 void taint_init(int log_taint)
 {
     g_log_taint = log_taint;
+
+    T(MOV, P_DREG_SREG, 1, 2, 0, T_REG|T_WR, T_REG|T_RD);
+    T(MOV, P_DREG_SMEM, 1, 2, 0, T_REG|T_WR, T_MEM|T_RD);
+    T(MOV, P_DMEM_UNTAINT, 1, 0, 0, T_MEM|T_WR, T_IMM|T_RD);
+    T(MOV, P_DMEM_SREG, 1, 2, 0, T_MEM|T_WR, T_REG|T_RD);
+    T(MOV, P_DREG_UNTAINT, 1, 0, 0, T_REG|T_WR, T_IMM|T_RD);
+
+    T(MOVSX, P_DREG_SMEM, 1, 2, 0, T_REG|T_WR, T_MEM|T_RD);
+
+    T(ADD, P_NOP, 0, 0, 0, T_REG|T_RD|T_WR, T_IMM|T_RD, T_REG|T_WR);
+    T(DEC, P_NOP, 0, 0, 0, T_REG|T_RD|T_WR, T_REG|T_WR);
+    T(SUB, P_NOP, 0, 0, 0, T_REG|T_RD|T_WR, T_IMM|T_RD, T_REG|T_WR);
+    T(XOR, P_DREG_SREG_SREG, 1, 1, 2, T_REG|T_RD|T_WR, T_REG|T_RD,
+        T_REG|T_WR);
+
+    T(POP, P_DREG_SMEM, 1, 2, 0, T_REG|T_WR, T_RD, T_MEM|T_RD, T_RD|T_WR);
+    T(PUSH, P_DMEM_SREG_PUSH, 3, 1, 0, T_REG|T_RD, T_WR, T_MEM|T_WR,
+        T_RD|T_WR);
+
+    T(CMP, P_NOP, 0, 0, 0, T_MEM|T_RD, T_IMM|T_RD, T_REG|T_WR);
+    T(CMP, P_NOP, 0, 0, 0, T_REG|T_RD, T_IMM|T_RD, T_REG|T_WR);
+    T(TEST, P_NOP, 0, 0, 0, T_REG|T_RD, T_REG|T_RD, T_REG|T_WR);
+
+    T(JB, P_NOP, 0, 0, 0, T_RD, T_REG|T_RD|T_WR, T_REG|T_RD);
+    T(JZ, P_NOP, 0, 0, 0, T_RD, T_REG|T_RD|T_WR, T_REG|T_RD);
+    T(JNZ, P_NOP, 0, 0, 0, T_RD, T_REG|T_RD|T_WR, T_REG|T_RD);
+    T(JMP, P_NOP, 0, 0, 0, T_RD, T_REG|T_RD|T_WR);
 }
