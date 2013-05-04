@@ -1,3 +1,5 @@
+#include <stdint.h>
+#include "pin.H"
 
 #ifdef TARGET_IA32
 

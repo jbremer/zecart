@@ -3,18 +3,6 @@
 #include "pin.H"
 #include "taint.h"
 
-#ifdef TARGET_IA32
-static uint8_t g_reg_taint[8];
-#else
-static uint8_t g_reg_taint[16];
-#endif
-
-static void prop_dstreg_srcreg(uint32_t dst, uint32_t src)
-{
-    g_reg_taint[dst] = g_reg_taint[src];
-}
-
-
 #define T_MEM 1
 #define T_ADR 2
 #define T_REG 4
@@ -24,7 +12,10 @@ static void prop_dstreg_srcreg(uint32_t dst, uint32_t src)
 
 static uint32_t taint_handler_count[XED_ICLASS_LAST];
 static uint32_t taint_handler_flag[XED_ICLASS_LAST][16];
-static AFUNPTR taint_handler_fn[XED_ICLASS_LAST][16];
+static taint_prop_t taint_handler_fn[XED_ICLASS_LAST][16];
+static const uint8_t *taint_handler_args[XED_ICLASS_LAST][16];
+
+static int g_log_taint;
 
 
 void taint_ins(INS ins, void *v)
@@ -62,6 +53,8 @@ void taint_ins(INS ins, void *v)
 
         for (uint32_t i = 0; i < taint_handler_count[opcode]; i++) {
             if(taint_handler_flag[opcode][i] == flags) {
+                taint_prop_handle(ins, taint_handler_fn[opcode][i],
+                    taint_handler_args[opcode][i]);
                 return;
             }
         }
@@ -77,16 +70,17 @@ static inline uint32_t combine(uint32_t a, uint32_t b, uint32_t c,
 }
 
 #define _FLAGS(a, b, c, d, e, ...) combine(a, b, c, d, e)
-#define FLAGS(...) _FLAGS(##__VA_ARGS__, 0, 0, 0, 0)
+#define FLAGS(...) _FLAGS(##__VA_ARGS__, 0, 0, 0, 0, 0)
 
-#define T(cls, handler, ...) { \
+#define T(cls, handler, a0, a1, a2, ...) { \
     const uint32_t count = taint_handler_count[XED_ICLASS_##cls]; \
-    taint_handler_fn[XED_ICLASS_##cls][count] = (AFUNPTR) handler; \
+    taint_handler_fn[XED_ICLASS_##cls][count] = handler; \
     taint_handler_flag[XED_ICLASS_##cls][count] = FLAGS(__VA_ARGS__); \
+    const static uint8_t indices[] = {a0-1, a1-1, a2-1}; \
+    taint_handler_args[XED_ICLASS_##cls][count] = indices; \
     taint_handler_count[XED_ICLASS_##cls]++; }
 
-void taint_init()
+void taint_init(int log_taint)
 {
-    T(MOV, &prop_dstreg_srcreg, T_REG|T_WR, T_REG|T_RD);
-    T(SUB, NULL, T_REG|T_RD|T_WR, T_IMM|T_RD, T_REG|T_WR);
+    g_log_taint = log_taint;
 }

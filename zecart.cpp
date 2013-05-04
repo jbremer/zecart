@@ -21,6 +21,7 @@ void insns(INS ins, void *v)
 
 int main(int argc, char *argv[])
 {
+    int log_taint = 0;
     for (int i = 3; i < argc; i++) {
         if(!strcmp(argv[i], "--main-module")) {
             set_main_module();
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     PIN_Init(argc, argv);
 
     registers_init();
+    taint_init(log_taint);
 
     IMG_AddInstrumentFunction(&module_range_handler, NULL);
     INS_AddInstrumentFunction(&insns, NULL);
