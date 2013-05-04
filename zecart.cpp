@@ -51,11 +51,16 @@ int main(int argc, char *argv[])
     }
 
     PIN_Init(argc, argv);
+    PIN_InitSymbols();
 
     registers_init();
     taint_init(log_taint);
 
+    taint_source_enable("getc");
+    taint_source_enable("scanf");
+
     IMG_AddInstrumentFunction(&module_range_handler, NULL);
+    IMG_AddInstrumentFunction(&taint_sources_handler, NULL);
     INS_AddInstrumentFunction(&insns, NULL);
 
     PIN_StartProgram();
